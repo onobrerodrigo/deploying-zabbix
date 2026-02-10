@@ -1,0 +1,6 @@
+# Ignorar arquivos de ambiente
+.env
+default.conf
+
+# Ignorar arquivos SSL
+*.pem

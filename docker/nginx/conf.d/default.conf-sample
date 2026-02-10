@@ -1,0 +1,29 @@
+server {
+    listen 80;
+    server_name subdominio.dominio.com.br;
+
+    # Permite validação do Let's Encrypt sem redirecionar
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+        allow all;
+    }
+
+    # Para todo o resto, redireciona para HTTPS
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name subdominio.dominio.com.br;
+
+    ssl_certificate /etc/nginx/ssl/subdominio.dominio.com.br.pem;
+    ssl_certificate_key /etc/nginx/ssl/subdominio.dominio.com.br-key.pem;
+
+    location / {
+        proxy_pass http://zabbix-web:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
