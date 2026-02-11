@@ -19,7 +19,7 @@ services:
       retries: 10
 
   zabbix-server:
-    image: zabbix/zabbix-server-mysql:5.0.47-ubuntu
+    image: zabbix/zabbix-server-mysql:5.0.47-alpine
     container_name: zabbix-server
     restart: unless-stopped
     environment:
@@ -41,7 +41,7 @@ services:
       - mysql
 
   zabbix-web:
-    image: zabbix/zabbix-web-nginx-mysql:5.0.47-ubuntu
+    image: zabbix/zabbix-web-nginx-mysql:5.0.47-alpine
     container_name: zabbix-web
     restart: unless-stopped
     environment:
