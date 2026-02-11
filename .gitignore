@@ -1,6 +1,7 @@
 # Ignorar arquivos de ambiente
 .env
 default.conf
+ginga_zbx.sql
 
 # Ignorar arquivos SSL
 *.pem
