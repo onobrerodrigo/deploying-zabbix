@@ -34,7 +34,7 @@ services:
       mysql:
         condition: service_healthy
     ports:
-      - "10050:10050"
+      - "10051:10051"
     networks:
       - zabbix-net
     links:
