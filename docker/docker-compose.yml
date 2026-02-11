@@ -3,6 +3,10 @@ services:
     image: mysql:8.0.45
     container_name: mysql-zabbix
     restart: unless-stopped
+    command: 
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_bin
+      - --log_bin_trust_function_creators=1
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
@@ -18,7 +22,7 @@ services:
       retries: 10
 
   zabbix-server:
-    image: zabbix/zabbix-server-mysql:6.0.43-ubuntu
+    image: zabbix/zabbix-server-mysql:6.0.42-alpine
     container_name: zabbix-server
     restart: unless-stopped
     environment:
@@ -40,7 +44,7 @@ services:
       - mysql
 
   zabbix-web:
-    image: zabbix/zabbix-web-nginx-mysql:6.0.43-ubuntu
+    image: zabbix/zabbix-web-nginx-mysql:6.0.42-alpine
     container_name: zabbix-web
     restart: unless-stopped
     environment:
@@ -49,7 +53,7 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       ZBX_SERVER_HOST: ${ZBX_SERVER_HOST}
-      TZ: ${TZ}
+      # TZ: ${TZ}
       PHP_TZ: ${PHP_TZ}
     depends_on:
       zabbix-server:
