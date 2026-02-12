@@ -1,57 +1,48 @@
 services:
-  mysql:
-    image: mysql:5.7.42
-    container_name: mysql-zabbix
+  postgres:
+    image: postgres:17.7-alpine
+    container_name: postgres-zabbix
     restart: unless-stopped
-    command: 
-      - --character-set-server=utf8
-      - --collation-server=utf8_bin
-      - --explicit_defaults_for_timestamp=1
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: ${POSTGRES_HOST_AUTH_METHOD}
     volumes:
-      - mysql_data:/var/lib/mysql
+      - postgres_data:/var/lib/postgres
     networks:
       - zabbix-net
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
-      retries: 10
 
   zabbix-server:
-    image: zabbix/zabbix-server-mysql:5.0.47-alpine
+    image: zabbix/zabbix-server-pgsql:5.0.47-alpine
     container_name: zabbix-server
     restart: unless-stopped
     environment:
       DB_SERVER_HOST: ${DB_SERVER_HOST}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       TZ: ${TZ}
       ZBX_CACHESIZE: ${ZBX_CACHESIZE}
     depends_on:
-      mysql:
-        condition: service_healthy
+      postgres:
+        condition: service_started
     ports:
       - "10051:10051"
     networks:
       - zabbix-net
     links:
-      - mysql
+      - postgres
 
   zabbix-web:
-    image: zabbix/zabbix-web-nginx-mysql:5.0.47-alpine
+    image: zabbix/zabbix-web-nginx-pgsql:5.0.47-alpine
     container_name: zabbix-web
     restart: unless-stopped
     environment:
       DB_SERVER_HOST: ${DB_SERVER_HOST}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       ZBX_SERVER_HOST: ${ZBX_SERVER_HOST}
       TZ: ${TZ}
       PHP_TZ: ${PHP_TZ}
@@ -61,7 +52,7 @@ services:
     networks:
       - zabbix-net
     links:
-      - mysql
+      - postgres
       - zabbix-server
 
   nginx-proxy:
@@ -82,7 +73,7 @@ services:
       - zabbix-net
 
 volumes:
-  mysql_data:
+  postgres_data:
 
 networks:
   zabbix-net:
